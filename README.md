@@ -37,7 +37,7 @@ pkg install -y git nodejs ffmpeg imagemagick && pkg install yarn
 ```
 
 ```bash
-git clone https://github.com/DanielDiod/Sumi-Sakurasawa.git && cd Sumi-Sakurasawa
+git clone https://github.com/Aqua200/Pok.git && cd Pok
 ```
 
 ```bash
