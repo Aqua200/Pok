@@ -1,54 +1,47 @@
 import { promises as fs } from 'fs';
 
-const charactersFilePath = './src/database/characters.json';
-const haremFilePath = './src/database/harem.json';
+const pokemonFilePath = './src/database/pokemon.json';
 
-async function loadCharacters() {
+async function loadPokemon() {
     try {
-        const data = await fs.readFile(charactersFilePath, 'utf-8');
+        const data = await fs.readFile(pokemonFilePath, 'utf-8');
         return JSON.parse(data);
     } catch (error) {
-        throw new Error('❀ No se pudo cargar el archivo characters.json.');
-    }
-}
-
-async function loadHarem() {
-    try {
-        const data = await fs.readFile(haremFilePath, 'utf-8');
-        return JSON.parse(data);
-    } catch (error) {
-        return [];
+        throw new Error('❀ No se pudo cargar el archivo pokemon.json.');
     }
 }
 
 let handler = async (m, { conn, args }) => {
-    const characterName = args.join(' ').toLowerCase().trim();
+    const pokemonName = args.join(' ').toLowerCase().trim();
 
     try {
-        const characters = await loadCharacters();
-        const character = characters.find(c => c.name.toLowerCase() === characterName);
+        const pokemons = await loadPokemon();
+        const pokemon = pokemons.find(p =>
+            p.name.toLowerCase() === pokemonName || (p.aliases && p.aliases.includes(pokemonName))
+        );
 
-        if (!character) {
-            await conn.reply(m.chat, `《✧》No se ha encontrado el personaje *${characterName}*. Asegúrate de que el nombre esté correcto.`, m);
+        if (!pokemon) {
+            await conn.reply(m.chat, `《✧》No se ha encontrado el Pokémon *${pokemonName}*. Asegúrate de que el nombre esté correcto.`, m);
             return;
         }
 
         // Seleccionar un video aleatorio
-        const randomVideo = character.vid[Math.floor(Math.random() * character.vid.length)];
+        const randomVideo = pokemon.vid[Math.floor(Math.random() * pokemon.vid.length)];
 
-        const message = `❀ Nombre » *${character.name}*
-⚥ Género » *${character.gender}*
-❖ Fuente » *${character.source}*`;
+        const message = `❀ Nombre » *${pokemon.name}*
+⚥ Género » *${pokemon.gender}*
+❖ Tipo » *${pokemon.type}*
+✦ Región » *${pokemon.region}*`;
 
-        await conn.sendFile(m.chat, randomVideo, `${character.name}.mp4`, message, m);
+        await conn.sendFile(m.chat, randomVideo, `${pokemon.name}.mp4`, message, m);
     } catch (error) {
-        await conn.reply(m.chat, `✘ Error al cargar el video del personaje: ${error.message}`, m);
+        await conn.reply(m.chat, `✘ Error al cargar el video del Pokémon: ${error.message}`, m);
     }
 };
 
-handler.help = ['wvideo <nombre del personaje>'];
-handler.tags = ['anime'];
-handler.command = ['charvideo', 'cvideo', 'wvideo', 'waifuvideo'];
+handler.help = ['pokevideo <nombre del Pokémon>'];
+handler.tags = ['pokemon'];
+handler.command = ['pokevideo', 'pkmvideo', 'pvideo'];
 handler.group = true;
 handler.register = true;
 
